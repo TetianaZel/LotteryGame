@@ -1,4 +1,5 @@
-﻿using LotteryGame.Interfaces;
+﻿using LotteryGame.Entities;
+using LotteryGame.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,9 +59,21 @@ namespace LotteryGame.Services
             return tickets;
         }
 
-        public void DisplayAllPlayersAndPurchases()
+        public void DisplayAllPlayersAndPurchases(List<Player> players)
         {
-            throw new NotImplementedException();
+            var sortedPlayers = players.OrderBy(player => player.Id).ToList();
+
+            Console.WriteLine("+------------+----------------------+");
+            Console.WriteLine("| Player ID | Tickets Purchased    |");
+            Console.WriteLine("+------------+----------------------+");
+
+            foreach (var player in sortedPlayers)
+            {
+                int ticketCount = player.Tickets.Count;
+                Console.WriteLine($"| {player.Id,-10} | {ticketCount,-20} |");
+            }
+
+            Console.WriteLine("+------------+----------------------+");
         }
 
         public void DisplayDrawResults()
@@ -68,7 +81,7 @@ namespace LotteryGame.Services
             throw new NotImplementedException();
         }
 
-        public void DisplayHouseRevenue(double houseRevenue)
+        public void DisplayHouseRevenue(decimal houseRevenue)
         {
             Console.WriteLine();
             Console.WriteLine($"House Revenue: {_gameSettings.Currency}{houseRevenue}");

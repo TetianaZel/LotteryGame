@@ -8,8 +8,8 @@ var serviceProvider = new ServiceCollection()
     .AddSingleton<GameSettings>()
     .AddSingleton<IRandomService, RandomService>()
     .AddSingleton<ILotteryService, LotteryService>()
-    .AddSingleton<ILotteryCpuGeneratorService, LotteryCpuGeneratorService>()
-    .AddSingleton<ILotteryCalculatorService, LotteryCalculatorService>()
+    .AddSingleton<IGeneratorService, GeneratorService>()
+    .AddSingleton<ICalculatorService, CalculatorService>()
     .AddSingleton<IUIManager, UIManager>()
     .BuildServiceProvider();
 

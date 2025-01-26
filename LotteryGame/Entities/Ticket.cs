@@ -10,8 +10,8 @@ namespace LotteryGame.Entities
     {
         private  int ticketCounter = 1;
 
-        public int Id { get; private set; }
-        public bool HasWon { get; private set; }
+        public int Id { get; set; }
+        public bool HasWon { get; set; }
         public int PlayerId { get; set; }
 
         public Ticket(int playerId)
@@ -21,11 +21,6 @@ namespace LotteryGame.Entities
             PlayerId = playerId;
 
             ticketCounter++;
-        }
-
-        private void MarkAsWinner()
-        {
-            HasWon = true;
         }
 
     }

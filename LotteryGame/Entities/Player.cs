@@ -10,11 +10,11 @@ namespace LotteryGame.Entities
     public class Player
     {
         public int Id { get; set; }
-        public double Balance { get; set; }
-        public double TotalWin { get; set; }
+        public decimal Balance { get; set; }
+        public decimal TotalWin { get; set; }
         public List<Ticket> Tickets { get; set; } = new();
 
-        public Player(int id, double initialBalance)
+        public Player(int id, decimal initialBalance)
         {
             Id = id;
             Balance = initialBalance;

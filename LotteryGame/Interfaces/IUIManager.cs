@@ -13,7 +13,7 @@ namespace LotteryGame.Interfaces
         int GetPlayerInputTickets(int maxTicketsPlayerCanBuy);
         void DisplayAllPlayersAndPurchases();
         void DisplayDrawResults();
-        void DisplayHouseRevenue(double houseRevenue);
+        void DisplayHouseRevenue(decimal houseRevenue);
 
     }
 }

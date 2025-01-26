@@ -54,15 +54,16 @@ namespace LotteryGame.Services
 
         public List<Ticket> PickWinningTickets(int count, List<Ticket> allTickets)
         {
+            List<Ticket> filtered = allTickets.Where(ticket => !ticket.HasWon).ToList();
 
-            if (count > allTickets.Count)
+            if (count > filtered.Count)
             {
                 throw new ArgumentException($"Requested number of winning tickets {count} exceeds the number of available tickets {allTickets}.");
             }
 
-            ShuffleTickets(allTickets);
+            ShuffleTickets(filtered);
 
-            var winningTickets = allTickets.Take(count).ToList();
+            var winningTickets = filtered.Take(count).ToList();
 
             foreach (var ticket in winningTickets)
             {

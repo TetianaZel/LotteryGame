@@ -51,9 +51,21 @@ namespace LotteryGame.Services
                 allTickets.AddRange(player.Tickets);
             }
 
+            bank.TotalRevenue = _calculator.CalculateTotalRevenue(players);
+
             foreach (Tier tier in tiers)
             {
+                tier.TierRevenue = _calculator.CalculateTierRevenue(tier, bank.TotalRevenue);
 
+                tier.WinningTicketsNumber = _calculator.CalculateWinningTicketsNumber(tier, allTickets.Count);
+
+                List<Ticket> winningTickets = _generator.PickWinningTickets(tier.WinningTicketsNumber, allTickets);
+
+                //get list of players from tickets and update in Tier
+
+                tier.RewardPerWinner = _calculator.CalculateRewardPerWinner(tier.TierRevenue, tier.WinningTicketsNumber);
+
+                tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(tier.RewardPerWinner, tier.WinningTicketsNumber);
             }
         }
 

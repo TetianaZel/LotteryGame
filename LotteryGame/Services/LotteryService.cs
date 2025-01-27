@@ -36,13 +36,15 @@ namespace LotteryGame.Services
 
             int maxTicketsPlayerCanBuy = GetUpperLimitTicketsToBuy(maxTicketsAffordableByBalance);
 
+            _uiManager.ShowGreetingMessage(maxTicketsPlayerCanBuy);
+
             Player player1 = InitializePlayer1(maxTicketsPlayerCanBuy);
 
             var players = _generator.GenerateCpuPlayers(maxTicketsPlayerCanBuy);
 
             players.Add(player1);
 
-            _uiManager.DisplayAllPlayersAndPurchases();
+            _uiManager.DisplayAllPlayersAndPurchases(players);
 
             List<Ticket> allTickets = new List<Ticket>();
 
@@ -57,16 +59,28 @@ namespace LotteryGame.Services
             {
                 tier.TierRevenue = _calculator.CalculateTierRevenue(tier, bank.TotalRevenue);
 
-                tier.WinningTicketsNumber = _calculator.CalculateWinningTicketsNumber(tier, allTickets.Count);
+                tier.WinningTicketsNumber = tier.GetWinningTicketsNumber(allTickets.Count);
 
-                List<Ticket> winningTickets = _generator.PickWinningTickets(tier.WinningTicketsNumber, allTickets);
+                tier.WinningTickets = _generator.PickWinningTickets(tier.WinningTicketsNumber, allTickets);
 
-                //get list of players from tickets and update in Tier
+                tier.WinningPlayerIds = tier.WinningTickets.Select(ticket => ticket.PlayerId).Distinct().ToList();                         
 
-                tier.RewardPerWinner = _calculator.CalculateRewardPerWinner(tier.TierRevenue, tier.WinningTicketsNumber);
+                tier.RewardPerWinner = _calculator.CalculateRewardPerWinningTicket(tier.TierRevenue, tier.WinningTicketsNumber);
 
                 tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(tier.RewardPerWinner, tier.WinningTicketsNumber);
+                
+                _uiManager.DisplayDrawResultsForTier(tier);
             }
+
+            bank.TotalDistributedReward = tiers.Sum(tier => tier.TierDistributedRevenue);
+
+            bank.HouseProfit = bank.TotalRevenue - bank.TotalDistributedReward;
+
+            _uiManager.DisplayHouseRevenue(bank.HouseProfit);
+
+            //debug, remove these 
+            Console.WriteLine($"Total bank was: {bank.TotalRevenue}");
+            Console.WriteLine($"Total distributed reward was: {bank.TotalDistributedReward}");
         }
 
         private Bank InitializeBank()
@@ -78,7 +92,7 @@ namespace LotteryGame.Services
         {
             return new List<Tier>
             {
-                new Tier(PrizeTier.GrandPrize, _gameSettings.GrandPrizeRevenueShare, _gameSettings.GrandPrizeWinningTickets),
+                new GrandPrizeTier(_gameSettings.GrandPrizeRevenueShare, _gameSettings.GrandPrizeWinningTickets),
                 new Tier(PrizeTier.SecondTier, _gameSettings.SecondTierRevenueShare, _gameSettings.SecondTierWinningTicketsShare),
                 new Tier(PrizeTier.ThirdTier, _gameSettings.ThirdTierRevenueShare, _gameSettings.ThirdTierWinningTicketsShare)
             };

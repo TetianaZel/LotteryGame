@@ -15,7 +15,8 @@ namespace LotteryGame.Entities
 
         public decimal TierRevenue { get; set; }
         public int WinningTicketsNumber { get; set; }
-        public List<Player> Winners { get; set; } = new();
+        public List<Ticket> WinningTickets { get; set; }
+        public List<int> WinningPlayerIds { get; set; } = new();
         public decimal RewardPerWinner { get; set; }
 
         public decimal TierDistributedRevenue { get; set; }
@@ -25,6 +26,11 @@ namespace LotteryGame.Entities
             Type = type;
             RevenueShare = revenueShare;
             WinningTicketsShare = winningTicketsShare;
+        }
+
+        public virtual int GetWinningTicketsNumber(int totalTicketsCount)
+        {
+            return (int)Math.Floor(totalTicketsCount * WinningTicketsShare);
         }
 
     }

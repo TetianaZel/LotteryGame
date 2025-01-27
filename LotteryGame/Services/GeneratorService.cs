@@ -45,7 +45,7 @@ namespace LotteryGame.Services
         {
             var tickets = new List<Ticket>();
 
-            for (int i = 0; i < ticketsCount + 1; i++) 
+            for (int i = 0; i < ticketsCount; i++) 
             {
                 tickets.Add(new Ticket(player.Id));
             }

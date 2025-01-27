@@ -13,6 +13,5 @@ var serviceProvider = new ServiceCollection()
     .AddSingleton<IUIManager, UIManager>()
     .BuildServiceProvider();
 
-var game = serviceProvider.GetRequiredService<IUIManager>();
-game.ShowGreetingMessage(10);
-game.GetPlayerInputTickets(10);
+var game = serviceProvider.GetRequiredService<ILotteryService>();
+game.RunLottery();

@@ -13,8 +13,7 @@ namespace LotteryGame.Interfaces
         decimal CalculateTotalRevenue(List<Player> players);
 
         decimal CalculateTierRevenue(Tier tier, decimal totalRevenue);
-        int CalculateWinningTicketsNumber(Tier tier, int totalTicketsCount);
-        decimal CalculateRewardPerWinner(decimal revenue, int winningTicketsCount);
+        decimal CalculateRewardPerWinningTicket(decimal revenue, int winningTicketsCount);
         decimal CalculateTierDistributedRevenue(decimal rewardPerWinner, int winningTicketsCount);
     }
 }

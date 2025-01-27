@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LotteryGame.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -11,8 +12,8 @@ namespace LotteryGame.Interfaces
     {
         void ShowGreetingMessage(int maxTicketsPlayerCanBuy);
         int GetPlayerInputTickets(int maxTicketsPlayerCanBuy);
-        void DisplayAllPlayersAndPurchases();
-        void DisplayDrawResults();
+        void DisplayAllPlayersAndPurchases(List<Player> players);
+        void DisplayDrawResultsForTier(Tier tier);
         void DisplayHouseRevenue(decimal houseRevenue);
 
     }

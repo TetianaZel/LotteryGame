@@ -20,33 +20,22 @@ namespace LotteryGame.Services
 
         public decimal CalculateTotalRevenue(List<Player> players)
         {
-            return players.Sum(player => player.Tickets.Count) * _gameSettings.TicketPrice; //update total revenue in tier
+            return players.Sum(player => player.Tickets.Count) * _gameSettings.TicketPrice;
         }
 
         public decimal CalculateTierRevenue(Tier tier, decimal totalRevenue)
         {
-            //validation needed?
-            tier.TierRevenue = totalRevenue * tier.RevenueShare;   //should be separate method to update revenue not in this class
-
-            return tier.TierRevenue;
+            return totalRevenue * tier.RevenueShare;
         }
 
-        public int CalculateWinningTicketsNumber(Tier tier, int totalTicketsCount)
+        public decimal CalculateRewardPerWinningTicket(decimal revenue, int winningTicketsCount)
         {
-            if (tier.Type == PrizeTier.GrandPrize)
+            if (winningTicketsCount == 0)
             {
-                return _gameSettings.GrandPrizeWinningTickets; //update  in tier
+                throw new Exception("Winning tickets count in this tier is 0. Can't calculate reward per ticket");
             }
 
-            else
-            {
-                return (int)Math.Floor(totalTicketsCount * tier.WinningTicketsShare);
-            }
-        }
-
-        public decimal CalculateRewardPerWinner(decimal revenue, int winningTicketsCount)
-        {
-            return Math.Floor(revenue / winningTicketsCount * 100) / 100; //update in tier
+            return Math.Floor(revenue / winningTicketsCount * 100) / 100;
         }
 
         public decimal CalculateTierDistributedRevenue(decimal rewardPerWinner, int winningTicketsCount)

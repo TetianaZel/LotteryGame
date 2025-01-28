@@ -13,7 +13,8 @@ namespace LotteryGame.Interfaces
         void ShowGreetingMessage(int maxTicketsPlayerCanBuy);
         int GetPlayerInputTickets(int maxTicketsPlayerCanBuy);
         void DisplayAllPlayersAndPurchases(List<Player> players);
-        void DisplayDrawResultsForTier(Tier tier);
+        void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, Tier tier);
+
         void DisplayHouseRevenue(decimal houseRevenue);
 
     }

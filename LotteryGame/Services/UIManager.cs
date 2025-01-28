@@ -28,7 +28,7 @@ namespace LotteryGame.Services
             Console.WriteLine($"* Your digital balance: {_gameSettings.Currency}{_gameSettings.PlayerInitialBalance}");
             Console.WriteLine($"* Ticket Price: {_gameSettings.Currency}{_gameSettings.TicketPrice} each");
             Console.WriteLine();
-            Console.WriteLine($"You can buy minimum {_gameSettings.MinTicketsPerPlayer} and maximum {maxTicketsPlayerCanBuy}");
+            Console.WriteLine($"You can buy minimum {_gameSettings.MinTicketsPerPlayer} and maximum {maxTicketsPlayerCanBuy} tickets");
             Console.WriteLine("How many tickets do you want to buy, Player 1?");
         }
 
@@ -71,13 +71,13 @@ namespace LotteryGame.Services
             var sortedPlayers = players.OrderBy(player => player.Id).ToList();
 
             Console.WriteLine("+------------+----------------------+");
-            Console.WriteLine("| Player ID  | Tickets Purchased    |");
+            Console.WriteLine("| Player ID  |  Tickets Purchased   |");
             Console.WriteLine("+------------+----------------------+");
 
             foreach (var player in sortedPlayers)
             {
                 int ticketCount = player.Tickets.Count;
-                Console.WriteLine($"| {player.Id,-10} | {ticketCount,-20} |");
+                Console.WriteLine($"|    {player.Id,-7} |          {ticketCount,-11} |");
             }
 
             Console.WriteLine("+------------+----------------------+");
@@ -87,31 +87,20 @@ namespace LotteryGame.Services
         }
 
 
-        public void DisplayDrawResultsForTier(Tier tier)
+        public void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, Tier tier)
         {
-            // Print the header for the tier
             Console.WriteLine($"* {FormatTierEnumName(tier.Type)} - Reward for a winning ticket is {_gameSettings.Currency}{tier.RewardPerWinningTicket}.");
             Console.WriteLine();
-            Console.WriteLine("--------------------------------------------------------------------------------");
+            Console.WriteLine("-----------------------------------------------------------------");
             Console.WriteLine($"|   Player    | How many tickets have won |    Total reward    |");
-            Console.WriteLine("--------------------------------------------------------------------------------");
+            Console.WriteLine("-----------------------------------------------------------------");
 
-            var result = tier.WinningPlayerIds
-                .Select(playerId => new
-                {
-                    PlayerId = playerId,
-                    WinningTicketsCount = tier.WinningTickets.Count(ticket => ticket.PlayerId == playerId)
-                })
-                .OrderByDescending(x => x.WinningTicketsCount).ToList();
-
-            foreach (var player in result)
+            foreach (var result in tierResults)
             {
-                var totalReward = player.WinningTicketsCount * tier.RewardPerWinningTicket;
-
-                Console.WriteLine($"|    {player.PlayerId,-6}   |             {player.WinningTicketsCount,-9}     |       {_gameSettings.Currency}{totalReward,-11} |");
+                Console.WriteLine($"|    {result.Key,-6}   |             {result.Value.winningTicketsCount,-9}     |       {_gameSettings.Currency}{result.Value.totalReward,-11} |");
             }
 
-            Console.WriteLine("--------------------------------------------------------------------------------");
+            Console.WriteLine("-----------------------------------------------------------------");
             Console.WriteLine();
         }
 

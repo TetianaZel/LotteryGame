@@ -70,7 +70,9 @@ namespace LotteryGame.Services
 
                 tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(tier.RewardPerWinningTicket, tier.WinningTicketsNumber);
                 
-                _uiManager.DisplayDrawResultsForTier(tier);
+                var tierResult = GetPlayerTierTotalReward(tier.WinningTickets, tier.RewardPerWinningTicket);
+
+                _uiManager.DisplayDrawResultsForTier(tierResult, tier);
             }
 
             bank.TotalDistributedReward = tiers.Sum(tier => tier.TierDistributedRevenue);
@@ -80,8 +82,8 @@ namespace LotteryGame.Services
             _uiManager.DisplayHouseRevenue(bank.HouseProfit);
 
             //debug, remove these 
-            Console.WriteLine($"Total bank was: {bank.TotalRevenue}");
-            Console.WriteLine($"Total distributed reward was: {bank.TotalDistributedReward}");
+            Console.WriteLine($"Total bank was: {_gameSettings.Currency}{bank.TotalRevenue}");
+            Console.WriteLine($"Total distributed reward was: {_gameSettings.Currency}{bank.TotalDistributedReward}");
         }
 
         private Bank InitializeBank()
@@ -133,24 +135,31 @@ namespace LotteryGame.Services
         {
             List<Ticket> tickets = new List<Ticket>();
 
-            for (int i = 0; i < count; i++) //check
+            for (int i = 0; i < count; i++)
             {
                 tickets.Add(new Ticket(player.Id));
             }
 
-            UpdatePlayerBalance(player, count * _gameSettings.TicketPrice);
-
             return tickets;
         }
 
-        public void UpdatePlayerBalance(Player player, decimal balanceChange)
-        {
-            if (player != null)
-            {
-                player.Balance += balanceChange;
-            }
-        }
 
+        public List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> GetPlayerTierTotalReward(List<Ticket> winningTickets, decimal tierRewardPerWinningTicket)
+        {
+            return winningTickets
+                .GroupBy(ticket => ticket.PlayerId)
+                .ToDictionary(
+                    group => group.Key,
+                    group =>
+                    (
+                        WinningTicketsCount: group.Count(),
+                        TotalReward: group.Count() * tierRewardPerWinningTicket
+                    )
+                )
+                .OrderByDescending(kvp => kvp.Value.WinningTicketsCount)
+                .ThenBy(kvp => kvp.Key)
+                .ToList();
+        }
 
 
     }

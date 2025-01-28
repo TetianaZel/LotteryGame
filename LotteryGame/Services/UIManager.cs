@@ -1,6 +1,7 @@
 ﻿using LotteryGame.Entities;
 using LotteryGame.Enums;
 using LotteryGame.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace LotteryGame.Services
     {
         private readonly GameSettings _gameSettings;
 
-        public UIManager(GameSettings gameSettings)
+        public UIManager(IOptions<GameSettings> gameSettings)
         {
-            _gameSettings = gameSettings;
+            _gameSettings = gameSettings.Value;
         }
 
         public void ShowGreetingMessage(int maxTicketsAffordable)
@@ -85,28 +86,35 @@ namespace LotteryGame.Services
             Console.WriteLine();
         }
 
+
         public void DisplayDrawResultsForTier(Tier tier)
         {
-            Console.Write($"* {FormatEnumName(tier.Type)}: ");
+            // Print the header for the tier
+            Console.WriteLine($"* {FormatTierEnumName(tier.Type)} - Reward for a winning ticket is {_gameSettings.Currency}{tier.RewardPerWinningTicket}.");
+            Console.WriteLine();
+            Console.WriteLine("--------------------------------------------------------------------------------");
+            Console.WriteLine($"|   Player    | How many tickets have won |    Total reward    |");
+            Console.WriteLine("--------------------------------------------------------------------------------");
 
-            if (tier.WinningPlayerIds == null || !tier.WinningPlayerIds.Any())
+            var result = tier.WinningPlayerIds
+                .Select(playerId => new
+                {
+                    PlayerId = playerId,
+                    WinningTicketsCount = tier.WinningTickets.Count(ticket => ticket.PlayerId == playerId)
+                })
+                .OrderByDescending(x => x.WinningTicketsCount).ToList();
+
+            foreach (var player in result)
             {
-                Console.WriteLine($"No winners for {tier.Type}.");
-                return;
+                var totalReward = player.WinningTicketsCount * tier.RewardPerWinningTicket;
+
+                Console.WriteLine($"|    {player.PlayerId,-6}   |             {player.WinningTicketsCount,-9}     |       {_gameSettings.Currency}{totalReward,-11} |");
             }
 
-            bool isSingleWinner = tier.WinningPlayerIds.Count == 1;
-
-            string winners = isSingleWinner
-                ? $"Player {tier.WinningPlayerIds.First()}"
-                : $"Players {string.Join(", ", tier.WinningPlayerIds)}";
-
-            string rewardMessage = $"{tier.RewardPerWinner}" + (isSingleWinner ? "" : " each");
-
-            Console.WriteLine($"{winners} won {_gameSettings.Currency}{rewardMessage}!");
-
+            Console.WriteLine("--------------------------------------------------------------------------------");
             Console.WriteLine();
         }
+
 
         public void DisplayHouseRevenue(decimal houseRevenue)
         {
@@ -115,7 +123,7 @@ namespace LotteryGame.Services
             Console.WriteLine($"House Revenue: {_gameSettings.Currency}{houseRevenue}");
         }
 
-        private static string FormatEnumName(PrizeTier tier)
+        private static string FormatTierEnumName(PrizeTier tier)
         {
             return string.Concat(tier.ToString()
                 .Select((character, index) => char.IsUpper(character) && index > 0 ? $" {character}" : character.ToString()));

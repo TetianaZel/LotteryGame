@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace LotteryGame
 {
-    public  class GameSettings
+    public class GameSettings
     {
-        public  decimal TicketPrice { get; set; } = 1.0m;
-        public  string Currency { get; set; } = "$";
-        public  int MaxTicketsPerPlayer { get; set; } = 10;
-        public  int MinTicketsPerPlayer { get; set; } = 1;
-        public  decimal PlayerInitialBalance { get; set; } = 10.0m;
-        public  int MinPlayersPerGame { get; set; } = 10;
-        public  int MaxPlayersPerGame { get; set; } = 15;
-        public  decimal GrandPrizeRevenueShare { get; set; } = 0.5m;
-        public  decimal SecondTierRevenueShare { get; set; } = 0.3m;
-        public  decimal ThirdTierRevenueShare { get; set; } = 0.1m;
-        public  int GrandPrizeWinningTickets { get; set; } = 1;
-        public  decimal SecondTierWinningTicketsShare { get; set; } = 0.1m;
-        public  decimal ThirdTierWinningTicketsShare { get; set; } = 0.2m;
+        public  decimal TicketPrice { get; set; }
+        public  string Currency { get; set; }
+        public  int MaxTicketsPerPlayer { get; set; }
+        public  int MinTicketsPerPlayer { get; set; }
+        public  decimal PlayerInitialBalance { get; set; }
+        public  int MinPlayersPerGame { get; set; }
+        public  int MaxPlayersPerGame { get; set; }
+        public  decimal GrandPrizeRevenueShare { get; set; }
+        public  decimal SecondTierRevenueShare { get; set; }
+        public  decimal ThirdTierRevenueShare { get; set; }
+        public  int GrandPrizeWinningTickets { get; set; }
+        public  decimal SecondTierWinningTicketsShare { get; set; }
+        public  decimal ThirdTierWinningTicketsShare { get; set; }
     }
 }

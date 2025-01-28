@@ -1,6 +1,7 @@
 ﻿using LotteryGame.Entities;
 using LotteryGame.Enums;
 using LotteryGame.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +11,16 @@ using System.Threading.Tasks;
 
 namespace LotteryGame.Services
 {
-    public class LotteryService : ILotteryService
+    public class LotteryService
     {
         private readonly GameSettings _gameSettings;
         private readonly IGeneratorService _generator;
         private readonly IUIManager _uiManager;
         private readonly ICalculatorService _calculator;
 
-        public LotteryService(GameSettings gameSettings, IGeneratorService generator, IUIManager uiManager, ICalculatorService calculator)
+        public LotteryService(IOptions<GameSettings> gameSettings, IGeneratorService generator, IUIManager uiManager, ICalculatorService calculator)
         {
-            _gameSettings = gameSettings;
+            _gameSettings = gameSettings.Value;
             _generator = generator;
             _uiManager = uiManager;
             _calculator = calculator;
@@ -65,9 +66,9 @@ namespace LotteryGame.Services
 
                 tier.WinningPlayerIds = tier.WinningTickets.Select(ticket => ticket.PlayerId).Distinct().ToList();                         
 
-                tier.RewardPerWinner = _calculator.CalculateRewardPerWinningTicket(tier.TierRevenue, tier.WinningTicketsNumber);
+                tier.RewardPerWinningTicket = _calculator.CalculateRewardPerWinningTicket(tier.TierRevenue, tier.WinningTicketsNumber);
 
-                tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(tier.RewardPerWinner, tier.WinningTicketsNumber);
+                tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(tier.RewardPerWinningTicket, tier.WinningTicketsNumber);
                 
                 _uiManager.DisplayDrawResultsForTier(tier);
             }

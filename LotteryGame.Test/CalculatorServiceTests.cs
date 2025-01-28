@@ -2,17 +2,27 @@ using LotteryGame.Entities;
 using LotteryGame.Enums;
 using LotteryGame.Interfaces;
 using LotteryGame.Services;
+using Microsoft.Extensions.Options;
+using Moq;
 
 namespace LotteryGame.Test
 {
     public class CalculatorServiceTests
     {
+        IOptions<GameSettings> GetGameSettingsOptions(GameSettings gameSettings)
+        {
+            var gameSettingsMock = new Mock<IOptions<GameSettings>>();
+            gameSettingsMock.Setup(x => x.Value).Returns(gameSettings);
+            return gameSettingsMock.Object;
+        }
+
         [Fact]
-        public void CalculateTotalRevenue_NoPlayers_ReturnsZero()
+        public void CalculateTotalRevenue_GivenNoPlayers_ReturnsZero()
         {
             //Arrange
             var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
             var players = new List<Player>();
 
             //Act
@@ -22,12 +32,17 @@ namespace LotteryGame.Test
             Assert.Equal(0, result);
         }
 
-        [Fact]
-        public void CalculateTotalRevenue_OnePlayerOneTicket_ReturnsOneTicketPrice() //fix
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(3, 3)]
+        [InlineData(10, 10)]
+        [InlineData(15, 15)]
+        public void CalculateTotalRevenue_GivenOnePlayerOneTicket_ReturnsOneTicketPrice(decimal ticketPrice, decimal expectedResult) //fix
         {
             //Arrange
-            var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettings = new GameSettings() { TicketPrice = ticketPrice };
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
             var player = new Player(2, gameSettings.PlayerInitialBalance);
             player.Tickets = new List<Ticket>() { new(player.Id) };
             var players = new List<Player>{player};
@@ -36,15 +51,20 @@ namespace LotteryGame.Test
             var result = calculatorService.CalculateTotalRevenue(players);
 
             //Assert
-            Assert.Equal(gameSettings.TicketPrice, result);
+            Assert.Equal(expectedResult, result);
         }
 
-        [Fact]
-        public void CalculateTotalRevenue_FivePlayersThreeTicketsEach_ReturnsCorrectTotalRevenue()
+        [Theory]
+        [InlineData(1, 15)]
+        [InlineData(2, 30)]
+        [InlineData(10, 150)]
+        [InlineData(0, 0)]
+        public void CalculateTotalRevenue_GivenFivePlayersThreeTicketsEach_ReturnsCorrectTotalRevenue(decimal ticketPrice, decimal expectedResult)
         {
             //Arrange
-            var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettings = new GameSettings() { TicketPrice = ticketPrice };
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
             var players = new List<Player>();
             for (int i = 0; i < 5; i++)
             {
@@ -57,17 +77,16 @@ namespace LotteryGame.Test
             var result = calculatorService.CalculateTotalRevenue(players);
 
             //Assert
-            var expectedRevenue = gameSettings.TicketPrice * 5 * 3; // 5 players, 3 tickets each
-
-            Assert.Equal(expectedRevenue, result);
+            Assert.Equal(expectedResult, result);
         }
 
         [Fact]
-        public void CalculateTierRevenue_ZeroTotalRevenue_ZeroTierRevenue()
+        public void CalculateTierRevenue_GivenZeroTotalRevenue_ReturnsZeroTierRevenue()
         {
             //Arrange
             var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
             var totalRevenue = 0;
             var tier = new Tier(PrizeTier.SecondTier, 0.1m, 0.3m);
 
@@ -88,7 +107,8 @@ namespace LotteryGame.Test
         {
             //Arrange
             var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
             var tier = new Tier(PrizeTier.SecondTier, revenueShare, 0.3m);
 
             //Act
@@ -106,7 +126,8 @@ namespace LotteryGame.Test
         {
             //Arrange
             var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
 
             //Act
             var result = calculatorService.CalculateRewardPerWinningTicket(revenue, winningTicketsCount);
@@ -116,11 +137,12 @@ namespace LotteryGame.Test
         }
 
         [Fact]
-        public void CalculateRewardPerWinningTicket_WinningTicketsCountZero_ThrowsException()
+        public void CalculateRewardPerWinningTicket_GivenWinningTicketsCountZero_ThrowsException()
         {
             //Arrange
             var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
 
             //Act + Assert
             Assert.Throws<Exception>(() => { calculatorService.CalculateRewardPerWinningTicket(100, 0); });
@@ -136,7 +158,8 @@ namespace LotteryGame.Test
         {
             //Arrange
             var gameSettings = new GameSettings();
-            var calculatorService = new CalculatorService(gameSettings);
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var calculatorService = new CalculatorService(gameSettingsOptions);
 
             //Act
             var result = calculatorService.CalculateTierDistributedRevenue(rewardPerWinner, winningTicketsCount);

@@ -1,6 +1,7 @@
 ﻿using LotteryGame.Entities;
 using LotteryGame.Enums;
 using LotteryGame.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace LotteryGame.Services
     {
         private readonly GameSettings _gameSettings;
 
-        public CalculatorService(GameSettings gameSettings)
+        public CalculatorService(IOptions<GameSettings> gameSettings)
         {
-            _gameSettings = gameSettings;
+            _gameSettings = gameSettings.Value;
         }
 
         public decimal CalculateTotalRevenue(List<Player> players)

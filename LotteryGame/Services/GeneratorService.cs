@@ -1,5 +1,6 @@
 ﻿using LotteryGame.Entities;
 using LotteryGame.Interfaces;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,9 @@ namespace LotteryGame.Services
         private readonly IRandomService _random;
         private readonly GameSettings _gameSettings;
 
-        public GeneratorService(GameSettings gameSettings, IRandomService random)
+        public GeneratorService(IOptions<GameSettings> gameSettings, IRandomService random)
         {
-            _gameSettings = gameSettings;
+            _gameSettings = gameSettings.Value;
             _random = random;
         }
 
@@ -74,14 +75,14 @@ namespace LotteryGame.Services
 
         }
 
-        private void ShuffleTickets(List<Ticket> allTickets)
+        public void ShuffleTickets(List<Ticket> allTickets)
         {
             // Fisher-Yates Shuffle algorithm to randomly shuffle tickets
 
             for (int i = allTickets.Count - 1; i > 0; i--)
             {
                 int j = _random.Generate(0, i); // Generate a random index between 0 and i
-                                                // Swap tickets at indices i and j
+                                                // Swap tickets at indexes i and j
                 Ticket temp = allTickets[i];
                 allTickets[i] = allTickets[j];
                 allTickets[j] = temp;

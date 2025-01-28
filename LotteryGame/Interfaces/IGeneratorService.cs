@@ -14,5 +14,7 @@ namespace LotteryGame.Interfaces
         List<Ticket> GenerateTickets(Player player, int ticketsCount);
 
         List<Ticket> PickWinningTickets(int count, List<Ticket> allTickets);
+
+        void ShuffleTickets(List<Ticket> allTickets);
     }
 }

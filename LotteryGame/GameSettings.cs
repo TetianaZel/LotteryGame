@@ -16,6 +16,7 @@ namespace LotteryGame
         public  decimal PlayerInitialBalance { get; set; }
         public  int MinPlayersPerGame { get; set; }
         public  int MaxPlayersPerGame { get; set; }
-        public List<Tier> Tiers { get; set; }
+        public List<Dictionary<string, object>> TierSettings { get; set; }
+
     }
 }

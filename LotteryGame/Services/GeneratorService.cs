@@ -53,6 +53,21 @@ namespace LotteryGame.Services
             return tickets;
         }
 
+
+        //duplicated methods from lottery svc
+
+        //public List<Ticket> PurchaseTickets(int count, Player player)
+        //{
+        //    List<Ticket> tickets = new List<Ticket>();
+
+        //    for (int i = 0; i < count; i++)
+        //    {
+        //        tickets.Add(new Ticket(player.Id));
+        //    }
+
+        //    return tickets;
+        //}
+
         public List<Ticket> PickWinningTickets(int count, List<Ticket> allTickets)
         {
             List<Ticket> filtered = allTickets.Where(ticket => !ticket.HasWon).ToList();

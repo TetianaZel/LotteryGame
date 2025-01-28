@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LotteryGame.Services
@@ -30,9 +31,10 @@ namespace LotteryGame.Services
             //VALIDATE LOTTERY SETTINGS
             int maxTicketsAffordableByBalance = (int)Math.Floor(_gameSettings.PlayerInitialBalance / _gameSettings.TicketPrice);
 
-            ValidateGameSettings(maxTicketsAffordableByBalance);
+            //fix
+            //ValidateGameSettings(maxTicketsAffordableByBalance);
 
-            List<Tier> tiers = InitializeTiers();
+            List<TierBase> tiers = InitializeTiers();
 
             int maxTicketsPlayerCanBuy = GetUpperLimitTicketsToBuy(maxTicketsAffordableByBalance);
 
@@ -55,13 +57,13 @@ namespace LotteryGame.Services
 
             var totalGameRevenue = _calculator.CalculateTotalRevenue(players);
 
-            Dictionary<PrizeTier, decimal> distributedRevenuePerTier = new();
+            Dictionary<string, decimal> distributedRevenuePerTier = new();
 
-            foreach (Tier tier in tiers)
+            foreach (TierBase tier in tiers)
             {
                 var tierRevenue = _calculator.CalculateTierRevenue(tier.RevenueShare, totalGameRevenue);
 
-                var winningTicketsCountCalculatedFromSettings = tier.GetWinningTicketsNumber(allTickets.Count);
+                var winningTicketsCountCalculatedFromSettings = tier.GetWinningTicketsCount(allTickets.Count);
 
                 var winningTickets = _generator.PickWinningTickets(winningTicketsCountCalculatedFromSettings, allTickets);                        
 
@@ -69,11 +71,11 @@ namespace LotteryGame.Services
 
                 var tierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(rewardPerWinningTicket, winningTicketsCountCalculatedFromSettings);
 
-                distributedRevenuePerTier.Add(tier.Type, tierDistributedRevenue);
+                distributedRevenuePerTier.Add(tier.Name, tierDistributedRevenue);
 
                 var tierResult = GetPlayerTierTotalReward(winningTickets, rewardPerWinningTicket);
 
-                _uiManager.DisplayDrawResultsForTier(tierResult, tier.Type, rewardPerWinningTicket);
+                _uiManager.DisplayDrawResultsForTier(tierResult, tier.Name, rewardPerWinningTicket);
             }
 
             var totalDistributedRewardPerGame = distributedRevenuePerTier.Values.Sum();
@@ -87,14 +89,12 @@ namespace LotteryGame.Services
             Console.WriteLine($"Total distributed reward was: {_gameSettings.Currency}{totalDistributedRewardPerGame}");
         }
 
-        private List<Tier> InitializeTiers()
+        private List<TierBase> InitializeTiers()
         {
-            return new List<Tier>
-            {
-                new GrandPrizeTier(_gameSettings.GrandPrizeRevenueShare, _gameSettings.GrandPrizeWinningTickets),
-                new Tier(PrizeTier.SecondTier, _gameSettings.SecondTierRevenueShare, _gameSettings.SecondTierWinningTicketsShare),
-                new Tier(PrizeTier.ThirdTier, _gameSettings.ThirdTierRevenueShare, _gameSettings.ThirdTierWinningTicketsShare)
-            };
+            var jsonSerializerOptions = new JsonSerializerOptions { Converters = {new TierJsonConverter(), new DecimalJsonConverter(), new IntJsonConverter()} };
+
+            return _gameSettings.TierSettings.Select(dict => JsonSerializer.Serialize(dict))
+                .Select(json => JsonSerializer.Deserialize<TierBase>(json, jsonSerializerOptions)).ToList();
         }
 
         private Player InitializePlayer1(int maxTicketsPlayerCanBuy)
@@ -114,18 +114,20 @@ namespace LotteryGame.Services
             return Math.Min(maxTicketsAffordable, _gameSettings.MaxTicketsPerPlayer);
         }
 
-        private void ValidateGameSettings(int maxTicketsAffordable)
-        {
-            if (_gameSettings.GrandPrizeRevenueShare + _gameSettings.SecondTierRevenueShare + _gameSettings.ThirdTierRevenueShare >= 1)
-            {
-                throw new Exception("Invalid revenue prize tier shares in the settings! Not profitable for the house!");
-            }
 
-            if (maxTicketsAffordable < _gameSettings.MinTicketsPerPlayer)
-            {
-                throw new Exception("Players can't afford to buy minimum required amount of tickets. Ticket price is too high for the players' initial balance.");
-            }
-        }
+        //FIX AND UNCOMMENT
+        //private void ValidateGameSettings(int maxTicketsAffordable)
+        //{
+        //    if (_gameSettings.GrandPrizeRevenueShare + _gameSettings.SecondTierRevenueShare + _gameSettings.ThirdTierRevenueShare >= 1)
+        //    {
+        //        throw new Exception("Invalid revenue prize tier shares in the settings! Not profitable for the house!");
+        //    }
+
+        //    if (maxTicketsAffordable < _gameSettings.MinTicketsPerPlayer)
+        //    {
+        //        throw new Exception("Players can't afford to buy minimum required amount of tickets. Ticket price is too high for the players' initial balance.");
+        //    }
+        //}
 
         public List<Ticket> PurchaseTickets(int count, Player player)
         {
@@ -140,7 +142,7 @@ namespace LotteryGame.Services
         }
 
 
-        public List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> GetPlayerTierTotalReward(List<Ticket> winningTickets, decimal tierRewardPerWinningTicket)
+        public Dictionary<int, (int winningTicketsCount, decimal totalReward)> GetPlayerTierTotalReward(List<Ticket> winningTickets, decimal tierRewardPerWinningTicket)
         {
             return winningTickets
                 .GroupBy(ticket => ticket.PlayerId)
@@ -154,7 +156,7 @@ namespace LotteryGame.Services
                 )
                 .OrderByDescending(kvp => kvp.Value.WinningTicketsCount)
                 .ThenBy(kvp => kvp.Key)
-                .ToList();
+                .ToDictionary();
         }
 
 

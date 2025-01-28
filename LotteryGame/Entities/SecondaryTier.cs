@@ -1,5 +1,4 @@
-﻿using LotteryGame.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace LotteryGame.Entities
 {
-    public class GrandPrizeTier : TierBase
+    public class SecondaryTier : TierBase
     {
-        public int WinningTicketsCount { get; set; }
+        public decimal WinningTicketsShare { get; set; }
 
         public override int GetWinningTicketsCount(int totalTicketsCount)
         {
-            return WinningTicketsCount;
+            return (int)Math.Floor(totalTicketsCount * WinningTicketsShare);
         }
     }
 }

@@ -87,9 +87,9 @@ namespace LotteryGame.Services
         }
 
 
-        public void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, PrizeTier type, decimal rewardPerWinningTicket)
+        public void DisplayDrawResultsForTier(Dictionary<int, (int winningTicketsCount, decimal totalReward)> tierResults, string tierName, decimal rewardPerWinningTicket)
         {
-            Console.WriteLine($"* {FormatTierEnumName(type)} - Reward for a winning ticket is {_gameSettings.Currency}{rewardPerWinningTicket}.");
+            Console.WriteLine($"* {tierName} - Reward for a winning ticket is {_gameSettings.Currency}{rewardPerWinningTicket}.");
             Console.WriteLine();
             Console.WriteLine("-----------------------------------------------------------------");
             Console.WriteLine($"|   Player    | How many tickets have won |    Total reward    |");
@@ -112,12 +112,5 @@ namespace LotteryGame.Services
             Console.WriteLine($"House Revenue: {_gameSettings.Currency}{houseRevenue}");
         }
 
-
-        //this will not be needed once I get rid of enum
-        private static string FormatTierEnumName(PrizeTier tier)
-        {
-            return string.Concat(tier.ToString()
-                .Select((character, index) => char.IsUpper(character) && index > 0 ? $" {character}" : character.ToString()));
-        }
     }
 }

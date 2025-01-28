@@ -18,30 +18,33 @@ namespace LotteryGame.Test
         [InlineData(95, 28)]
         [InlineData(87, 26)]
         [InlineData(81, 24)]
-        public void GetWinningTicketsNumber_GivenTotalTicketsCount_ReturnsCorrectWinningTicketsAmount(int totalTicketsCount, int expectedResult)
+        public void GetWinningTicketsCount_GivenTotalTicketsCount_ReturnsCorrectWinningTicketsAmount(int totalTicketsCount, int expectedResult)
         {
             //Arrange
-            var tier = new Tier(PrizeTier.SecondTier, 0.3m, 0.3m);
+            var tier = new SecondaryTier { Name = "AnySecondaryTier", RevenueShare = 0.3m, WinningTicketsShare = 0.3m};
 
             //Act
-            var result = tier.GetWinningTicketsNumber(totalTicketsCount);
+            var result = tier.GetWinningTicketsCount(totalTicketsCount);
 
             //Assert
             Assert.Equal(expectedResult, result);
         }
 
-        [Fact]
-        public void GetWinningTicketsNumber_GrandPrizeTier_ReturnsTicketsNumberFromSettings()
+        [Theory]
+        [InlineData(1, 100)]
+        [InlineData(0, 95)]
+        [InlineData(2, 10)]
+        [InlineData(10, 10)]
+        public void GetWinningTicketsCount_GrandPrizeTier_ReturnsExpectedCount(int expectedWinningTicketsCount, int totalTicketsCount)
         {
             //Arrange
-            var gameSettings = new GameSettings();
-            var grandPrizeTier = new GrandPrizeTier(gameSettings.GrandPrizeRevenueShare, gameSettings.GrandPrizeWinningTickets);
+            var grandPrizeTier = new GrandPrizeTier { Name = "GrandPrizeTier", RevenueShare = 0.5m, WinningTicketsCount = expectedWinningTicketsCount };
 
             //Act
-            var result = grandPrizeTier.GetWinningTicketsNumber(50);
+            var result = grandPrizeTier.GetWinningTicketsCount(totalTicketsCount);
 
             //Assert
-            Assert.Equal(gameSettings.GrandPrizeWinningTickets, result);
+            Assert.Equal(expectedWinningTicketsCount, result);
         }
     }
 }

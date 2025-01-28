@@ -31,7 +31,6 @@ namespace LotteryGame.Services
             int maxTicketsAffordableByBalance = (int)Math.Floor(_gameSettings.PlayerInitialBalance / _gameSettings.TicketPrice);
 
             ValidateGameSettings(maxTicketsAffordableByBalance);
-            var bank = InitializeBank();
 
             List<Tier> tiers = InitializeTiers();
 
@@ -54,42 +53,38 @@ namespace LotteryGame.Services
                 allTickets.AddRange(player.Tickets);
             }
 
-            bank.TotalRevenue = _calculator.CalculateTotalRevenue(players);
+            var totalGameRevenue = _calculator.CalculateTotalRevenue(players);
 
-            //fix unnecessary properties
+            Dictionary<PrizeTier, decimal> distributedRevenuePerTier = new();
+
             foreach (Tier tier in tiers)
             {
-                tier.TierRevenue = _calculator.CalculateTierRevenue(tier, bank.TotalRevenue);
+                var tierRevenue = _calculator.CalculateTierRevenue(tier.RevenueShare, totalGameRevenue);
 
-                tier.WinningTicketsCountFromSettings = tier.GetWinningTicketsNumber(allTickets.Count);
+                var winningTicketsCountCalculatedFromSettings = tier.GetWinningTicketsNumber(allTickets.Count);
 
-                var winningTickets = _generator.PickWinningTickets(tier.WinningTicketsCountFromSettings, allTickets);
+                var winningTickets = _generator.PickWinningTickets(winningTicketsCountCalculatedFromSettings, allTickets);                        
 
-                tier.WinningPlayerIds = winningTickets.Select(ticket => ticket.PlayerId).Distinct().ToList();                         
+                var rewardPerWinningTicket = _calculator.CalculateRewardPerWinningTicket(tierRevenue, winningTicketsCountCalculatedFromSettings);
 
-                var rewardPerWinningTicket = _calculator.CalculateRewardPerWinningTicket(tier.TierRevenue, tier.WinningTicketsCountFromSettings);
+                var tierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(rewardPerWinningTicket, winningTicketsCountCalculatedFromSettings);
 
-                tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(rewardPerWinningTicket, tier.WinningTicketsCountFromSettings);
-                
+                distributedRevenuePerTier.Add(tier.Type, tierDistributedRevenue);
+
                 var tierResult = GetPlayerTierTotalReward(winningTickets, rewardPerWinningTicket);
 
                 _uiManager.DisplayDrawResultsForTier(tierResult, tier.Type, rewardPerWinningTicket);
             }
 
-            bank.TotalDistributedReward = tiers.Sum(tier => tier.TierDistributedRevenue);
+            var totalDistributedRewardPerGame = distributedRevenuePerTier.Values.Sum();
 
-            bank.HouseProfit = bank.TotalRevenue - bank.TotalDistributedReward;
+            var houseProfit = totalGameRevenue - totalDistributedRewardPerGame;
 
-            _uiManager.DisplayHouseRevenue(bank.HouseProfit);
+            _uiManager.DisplayHouseRevenue(houseProfit);
 
             //debug, remove these 
-            Console.WriteLine($"Total bank was: {_gameSettings.Currency}{bank.TotalRevenue}");
-            Console.WriteLine($"Total distributed reward was: {_gameSettings.Currency}{bank.TotalDistributedReward}");
-        }
-
-        private Bank InitializeBank()
-        {
-            return new Bank();
+            Console.WriteLine($"Total bank was: {_gameSettings.Currency}{totalGameRevenue}");
+            Console.WriteLine($"Total distributed reward was: {_gameSettings.Currency}{totalDistributedRewardPerGame}");
         }
 
         private List<Tier> InitializeTiers()

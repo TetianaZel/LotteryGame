@@ -10,15 +10,9 @@ namespace LotteryGame.Entities
     public class Tier
     {
         public PrizeTier Type { get; set; }
+        public string Name { get; set; }
         public decimal RevenueShare { get; set; }
         public decimal WinningTicketsShare { get; set; }
-
-        public decimal TierRevenue { get; set; }
-        public int WinningTicketsCountFromSettings { get; set; }
-        public List<int> WinningPlayerIds { get; set; } = new();
-        //public decimal RewardPerWinningTicket { get; set; }
-
-        public decimal TierDistributedRevenue { get; set; }
 
         public Tier(PrizeTier type, decimal revenueShare, decimal winningTicketsShare)
         {

@@ -24,9 +24,9 @@ namespace LotteryGame.Services
             return players.Sum(player => player.Tickets.Count) * _gameSettings.TicketPrice;
         }
 
-        public decimal CalculateTierRevenue(Tier tier, decimal totalRevenue)
+        public decimal CalculateTierRevenue(decimal revenueShare, decimal totalRevenue)
         {
-            return totalRevenue * tier.RevenueShare;
+            return totalRevenue * revenueShare;
         }
 
         public decimal CalculateRewardPerWinningTicket(decimal revenue, int winningTicketsCount)

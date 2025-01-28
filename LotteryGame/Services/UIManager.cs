@@ -112,6 +112,8 @@ namespace LotteryGame.Services
             Console.WriteLine($"House Revenue: {_gameSettings.Currency}{houseRevenue}");
         }
 
+
+        //this will not be needed once I get rid of enum
         private static string FormatTierEnumName(PrizeTier tier)
         {
             return string.Concat(tier.ToString()

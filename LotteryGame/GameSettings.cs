@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LotteryGame.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,11 +16,6 @@ namespace LotteryGame
         public  decimal PlayerInitialBalance { get; set; }
         public  int MinPlayersPerGame { get; set; }
         public  int MaxPlayersPerGame { get; set; }
-        public  decimal GrandPrizeRevenueShare { get; set; }
-        public  decimal SecondTierRevenueShare { get; set; }
-        public  decimal ThirdTierRevenueShare { get; set; }
-        public  int GrandPrizeWinningTickets { get; set; }
-        public  decimal SecondTierWinningTicketsShare { get; set; }
-        public  decimal ThirdTierWinningTicketsShare { get; set; }
+        public List<Tier> Tiers { get; set; }
     }
 }

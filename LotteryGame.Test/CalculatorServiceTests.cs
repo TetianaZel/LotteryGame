@@ -88,10 +88,9 @@ namespace LotteryGame.Test
             var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
             var calculatorService = new CalculatorService(gameSettingsOptions);
             var totalRevenue = 0;
-            var tier = new Tier(PrizeTier.SecondTier, 0.1m, 0.3m);
 
             //Act
-            var result = calculatorService.CalculateTierRevenue(tier, totalRevenue);
+            var result = calculatorService.CalculateTierRevenue(0.1m, totalRevenue);
 
             //Assert
             Assert.Equal(0, result);
@@ -109,10 +108,9 @@ namespace LotteryGame.Test
             var gameSettings = new GameSettings();
             var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
             var calculatorService = new CalculatorService(gameSettingsOptions);
-            var tier = new Tier(PrizeTier.SecondTier, revenueShare, 0.3m);
 
             //Act
-            var result = calculatorService.CalculateTierRevenue(tier, totalRevenue);
+            var result = calculatorService.CalculateTierRevenue(revenueShare, totalRevenue);
 
             //Assert
             Assert.Equal(expectedResult, result);

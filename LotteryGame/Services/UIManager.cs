@@ -87,9 +87,9 @@ namespace LotteryGame.Services
         }
 
 
-        public void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, Tier tier)
+        public void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, PrizeTier type, decimal rewardPerWinningTicket)
         {
-            Console.WriteLine($"* {FormatTierEnumName(tier.Type)} - Reward for a winning ticket is {_gameSettings.Currency}{tier.RewardPerWinningTicket}.");
+            Console.WriteLine($"* {FormatTierEnumName(type)} - Reward for a winning ticket is {_gameSettings.Currency}{rewardPerWinningTicket}.");
             Console.WriteLine();
             Console.WriteLine("-----------------------------------------------------------------");
             Console.WriteLine($"|   Player    | How many tickets have won |    Total reward    |");

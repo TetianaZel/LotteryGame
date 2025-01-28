@@ -14,10 +14,9 @@ namespace LotteryGame.Entities
         public decimal WinningTicketsShare { get; set; }
 
         public decimal TierRevenue { get; set; }
-        public int WinningTicketsNumber { get; set; }
-        public List<Ticket> WinningTickets { get; set; }
+        public int WinningTicketsCountFromSettings { get; set; }
         public List<int> WinningPlayerIds { get; set; } = new();
-        public decimal RewardPerWinningTicket { get; set; }
+        //public decimal RewardPerWinningTicket { get; set; }
 
         public decimal TierDistributedRevenue { get; set; }
 

@@ -56,23 +56,24 @@ namespace LotteryGame.Services
 
             bank.TotalRevenue = _calculator.CalculateTotalRevenue(players);
 
+            //fix unnecessary properties
             foreach (Tier tier in tiers)
             {
                 tier.TierRevenue = _calculator.CalculateTierRevenue(tier, bank.TotalRevenue);
 
-                tier.WinningTicketsNumber = tier.GetWinningTicketsNumber(allTickets.Count);
+                tier.WinningTicketsCountFromSettings = tier.GetWinningTicketsNumber(allTickets.Count);
 
-                tier.WinningTickets = _generator.PickWinningTickets(tier.WinningTicketsNumber, allTickets);
+                var winningTickets = _generator.PickWinningTickets(tier.WinningTicketsCountFromSettings, allTickets);
 
-                tier.WinningPlayerIds = tier.WinningTickets.Select(ticket => ticket.PlayerId).Distinct().ToList();                         
+                tier.WinningPlayerIds = winningTickets.Select(ticket => ticket.PlayerId).Distinct().ToList();                         
 
-                tier.RewardPerWinningTicket = _calculator.CalculateRewardPerWinningTicket(tier.TierRevenue, tier.WinningTicketsNumber);
+                var rewardPerWinningTicket = _calculator.CalculateRewardPerWinningTicket(tier.TierRevenue, tier.WinningTicketsCountFromSettings);
 
-                tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(tier.RewardPerWinningTicket, tier.WinningTicketsNumber);
+                tier.TierDistributedRevenue = _calculator.CalculateTierDistributedRevenue(rewardPerWinningTicket, tier.WinningTicketsCountFromSettings);
                 
-                var tierResult = GetPlayerTierTotalReward(tier.WinningTickets, tier.RewardPerWinningTicket);
+                var tierResult = GetPlayerTierTotalReward(winningTickets, rewardPerWinningTicket);
 
-                _uiManager.DisplayDrawResultsForTier(tierResult, tier);
+                _uiManager.DisplayDrawResultsForTier(tierResult, tier.Type, rewardPerWinningTicket);
             }
 
             bank.TotalDistributedReward = tiers.Sum(tier => tier.TierDistributedRevenue);

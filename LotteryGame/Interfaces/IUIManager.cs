@@ -1,4 +1,5 @@
 ﻿using LotteryGame.Entities;
+using LotteryGame.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace LotteryGame.Interfaces
         void ShowGreetingMessage(int maxTicketsPlayerCanBuy);
         int GetPlayerInputTickets(int maxTicketsPlayerCanBuy);
         void DisplayAllPlayersAndPurchases(List<Player> players);
-        void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, Tier tier);
+        public void DisplayDrawResultsForTier(List<KeyValuePair<int, (int winningTicketsCount, decimal totalReward)>> tierResults, PrizeTier type, decimal rewardPerWinningTicket);
 
         void DisplayHouseRevenue(decimal houseRevenue);
 

@@ -1,9 +1,4 @@
 ﻿using LotteryGame.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LotteryGame.Interfaces
 {
@@ -11,7 +6,7 @@ namespace LotteryGame.Interfaces
     {
         List<Player> GenerateCpuPlayers(int maxTicketsPlayersCanBuy);
 
-        List<Ticket> GenerateTickets(Player player, int ticketsCount);
+        List<Ticket> GenerateTickets(int ticketsCount, Player player);
 
         List<Ticket> PickWinningTickets(int count, List<Ticket> allTickets);
 

@@ -1,12 +1,7 @@
-﻿using LotteryGame.Entities;
-using LotteryGame.Enums;
+﻿using ConsoleTables;
+using LotteryGame.Entities;
 using LotteryGame.Interfaces;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LotteryGame.Services
 {
@@ -68,19 +63,15 @@ namespace LotteryGame.Services
             Console.WriteLine("Other CPU players also have purchased tickets.");
             Console.WriteLine();
 
-            var sortedPlayers = players.OrderBy(player => player.Id).ToList();
+            var sortedPlayers = players.OrderBy(player => player.Id);
 
-            Console.WriteLine("+------------+----------------------+");
-            Console.WriteLine("| Player ID  |  Tickets Purchased   |");
-            Console.WriteLine("+------------+----------------------+");
-
+            var table = new ConsoleTable("Player ID", "Tickets Purchased");
             foreach (var player in sortedPlayers)
             {
-                int ticketCount = player.Tickets.Count;
-                Console.WriteLine($"|    {player.Id,-7} |          {ticketCount,-11} |");
+                table.AddRow(player.Id, player.Tickets.Count);
             }
+            table.Write(Format.Minimal);
 
-            Console.WriteLine("+------------+----------------------+");
             Console.WriteLine();
             Console.WriteLine("Ticket Draw Results:");
             Console.WriteLine();
@@ -90,20 +81,41 @@ namespace LotteryGame.Services
         public void DisplayDrawResultsForTier(Dictionary<int, (int winningTicketsCount, decimal totalReward)> tierResults, string tierName, decimal rewardPerWinningTicket)
         {
             Console.WriteLine($"* {tierName} - Reward for a winning ticket is {_gameSettings.Currency}{rewardPerWinningTicket}.");
-            Console.WriteLine();
-            Console.WriteLine("-----------------------------------------------------------------");
-            Console.WriteLine($"|   Player    | How many tickets have won |    Total reward    |");
-            Console.WriteLine("-----------------------------------------------------------------");
 
+            var table = new ConsoleTable("Player", "How many tickets have won", "Total reward");
             foreach (var result in tierResults)
             {
-                Console.WriteLine($"|    {result.Key,-6}   |             {result.Value.winningTicketsCount,-9}     |       {_gameSettings.Currency}{result.Value.totalReward,-11} |");
+                table.AddRow(result.Key, result.Value.winningTicketsCount, result.Value.totalReward);
             }
-
-            Console.WriteLine("-----------------------------------------------------------------");
+            table.Write(Format.Minimal);
             Console.WriteLine();
+
         }
 
+        public void ShowResult(LotteryResult result)
+        {
+            foreach (var tierResult in result.TierResults)
+            {
+                ShowTierResult(tierResult);
+            }
+            DisplayHouseRevenue(result.HouseProfit);
+        }
+
+        private void ShowTierResult(TierResult tierResult)
+        {
+            Console.WriteLine($"* {tierResult.Tier.Name} - Reward for a winning ticket is {_gameSettings.Currency}{tierResult.RewardPerWinningTicket}.");
+
+            var table = new ConsoleTable("Player", "How many tickets have won", "Total reward");
+
+            foreach (var userTickets in tierResult.WinningTickets.GroupBy(t => t.PlayerId)
+                .OrderByDescending(g => g.Count()).ThenBy(g => g.Key))
+            {
+                var winningTikets = userTickets.Count();
+                table.AddRow(userTickets.Key, winningTikets, winningTikets * tierResult.RewardPerWinningTicket);
+            }
+            table.Write(Format.Minimal);
+            Console.WriteLine();
+        }
 
         public void DisplayHouseRevenue(decimal houseRevenue)
         {
@@ -111,6 +123,5 @@ namespace LotteryGame.Services
             Console.WriteLine();
             Console.WriteLine($"House Revenue: {_gameSettings.Currency}{houseRevenue}");
         }
-
     }
 }

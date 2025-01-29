@@ -1,11 +1,6 @@
 ﻿using LotteryGame.Entities;
 using LotteryGame.Interfaces;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LotteryGame.Services
 {
@@ -22,17 +17,17 @@ namespace LotteryGame.Services
 
         public List<Player> GenerateCpuPlayers(int maxTicketsPlayersCanBuy)
         {
-            int totalPlayers = _random.Generate(_gameSettings.MinPlayersPerGame, _gameSettings.MaxPlayersPerGame);           
-            
+            int totalPlayers = _random.Generate(_gameSettings.MinPlayersPerGame, _gameSettings.MaxPlayersPerGame);
+
             var cpuPlayers = new List<Player>();
 
-            for (int i = 2; i < totalPlayers + 1; i++) 
+            for (int i = 2; i < totalPlayers + 1; i++)
             {
                 var randomTicketsCount = _random.Generate(_gameSettings.MinTicketsPerPlayer, maxTicketsPlayersCanBuy);
 
                 var newPlayer = new Player(i, _gameSettings.PlayerInitialBalance);
 
-                var tickets = GenerateTickets(newPlayer, randomTicketsCount);
+                var tickets = GenerateTickets(randomTicketsCount, newPlayer);
 
                 newPlayer.Tickets = tickets;
 
@@ -42,31 +37,19 @@ namespace LotteryGame.Services
             return cpuPlayers;
         }
 
-        public List<Ticket> GenerateTickets(Player player, int ticketsCount)
+        public List<Ticket> GenerateTickets(int ticketsCount, Player player)
         {
             var tickets = new List<Ticket>();
 
-            for (int i = 0; i < ticketsCount; i++) 
+            for (int i = 0; i < ticketsCount; i++)
             {
-                tickets.Add(new Ticket(player.Id));
+                tickets.Add(new Ticket(player.Id)
+                {
+                    Price = _gameSettings.TicketPrice,
+                });
             }
             return tickets;
         }
-
-
-        //duplicated methods from lottery svc
-
-        //public List<Ticket> PurchaseTickets(int count, Player player)
-        //{
-        //    List<Ticket> tickets = new List<Ticket>();
-
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        tickets.Add(new Ticket(player.Id));
-        //    }
-
-        //    return tickets;
-        //}
 
         public List<Ticket> PickWinningTickets(int count, List<Ticket> allTickets)
         {
@@ -74,7 +57,7 @@ namespace LotteryGame.Services
 
             if (count > filtered.Count)
             {
-                throw new ArgumentException($"Requested number of winning tickets {count} exceeds the number of available tickets {allTickets}.");
+                throw new LotteryException($"Requested number of winning tickets {count} exceeds the number of available tickets {allTickets}.");
             }
 
             ShuffleTickets(filtered);
@@ -92,8 +75,6 @@ namespace LotteryGame.Services
 
         public void ShuffleTickets(List<Ticket> allTickets)
         {
-            // Fisher-Yates Shuffle algorithm to randomly shuffle tickets
-
             for (int i = allTickets.Count - 1; i > 0; i--)
             {
                 int j = _random.Generate(0, i); // Generate a random index between 0 and i

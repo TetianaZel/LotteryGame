@@ -1,27 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace LotteryGame.Entities
+﻿namespace LotteryGame.Entities
 {
     public class Ticket
     {
-        private  int ticketCounter = 1;
-
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public bool HasWon { get; set; }
         public int PlayerId { get; set; }
+        public decimal Price { get; set; }
 
         public Ticket(int playerId)
         {
-            Id = ticketCounter;
-            HasWon = false;
+            Id = Guid.NewGuid();
             PlayerId = playerId;
-
-            ticketCounter++;
         }
-
     }
 }

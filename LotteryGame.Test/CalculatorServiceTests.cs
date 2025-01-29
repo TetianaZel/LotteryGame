@@ -1,6 +1,4 @@
 using LotteryGame.Entities;
-using LotteryGame.Enums;
-using LotteryGame.Interfaces;
 using LotteryGame.Services;
 using Microsoft.Extensions.Options;
 using Moq;

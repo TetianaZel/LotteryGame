@@ -78,20 +78,6 @@ namespace LotteryGame.Services
         }
 
 
-        public void DisplayDrawResultsForTier(Dictionary<int, (int winningTicketsCount, decimal totalReward)> tierResults, string tierName, decimal rewardPerWinningTicket)
-        {
-            Console.WriteLine($"* {tierName} - Reward for a winning ticket is {_gameSettings.Currency}{rewardPerWinningTicket}.");
-
-            var table = new ConsoleTable("Player", "How many tickets have won", "Total reward");
-            foreach (var result in tierResults)
-            {
-                table.AddRow(result.Key, result.Value.winningTicketsCount, result.Value.totalReward);
-            }
-            table.Write(Format.Minimal);
-            Console.WriteLine();
-
-        }
-
         public void ShowResult(LotteryResult result)
         {
             foreach (var tierResult in result.TierResults)
@@ -104,6 +90,7 @@ namespace LotteryGame.Services
         private void ShowTierResult(TierResult tierResult)
         {
             Console.WriteLine($"* {tierResult.Tier.Name} - Reward for a winning ticket is {_gameSettings.Currency}{tierResult.RewardPerWinningTicket}.");
+            Console.WriteLine();
 
             var table = new ConsoleTable("Player", "How many tickets have won", "Total reward");
 

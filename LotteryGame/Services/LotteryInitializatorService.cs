@@ -60,15 +60,14 @@ namespace LotteryGame.Services
             }
             if (tiers.Sum(t => t.RevenueShare) > 1)
             {
-                throw new LotteryException("Invalid tiers revenue. Sum of all revenues must be less than 1");
+                throw new LotteryException("Invalid tiers revenue shares. Sum of all shares must be less than 1");
             }
             return tiers;
         }
 
         private Player InitializeUIPlayer(int ticketsCount)
         {
-            Player UIplayer = new Player(1, _gameSettings.PlayerInitialBalance);  //int ticketsToBuy = _uiManager.GetPlayerInputTickets(maxTicketsPlayerCanBuy);
-
+            Player UIplayer = new Player(1, _gameSettings.PlayerInitialBalance);
             List<Ticket> listTicketsForUIPlayer = _generator.GenerateTickets(ticketsCount, UIplayer);
 
             UIplayer.Tickets = listTicketsForUIPlayer;

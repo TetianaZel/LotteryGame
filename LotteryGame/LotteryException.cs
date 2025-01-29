@@ -12,13 +12,6 @@ namespace LotteryGame
         public LotteryException(string? message) : base(message)
         {
         }
-
-        public LotteryException(string? message, Exception? innerException) : base(message, innerException)
-        {
-        }
-
-        protected LotteryException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
+       
     }
 }

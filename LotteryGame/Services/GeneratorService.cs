@@ -77,8 +77,8 @@ namespace LotteryGame.Services
         {
             for (int i = allTickets.Count - 1; i > 0; i--)
             {
-                int j = _random.Generate(0, i); // Generate a random index between 0 and i
-                                                // Swap tickets at indexes i and j
+                int j = _random.Generate(0, i); 
+                                                
                 Ticket temp = allTickets[i];
                 allTickets[i] = allTickets[j];
                 allTickets[j] = temp;

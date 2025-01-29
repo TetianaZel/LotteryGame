@@ -34,7 +34,6 @@ namespace LotteryGame.Services
 
                 totalDistributedRewardPerGame += tierDistributedRevenue;
 
-                //var tierResultPerUser = GetPlayerTierTotalReward(winningTickets, rewardPerWinningTicket);
                 var tierResult = new TierResult()
                 {
                     Tier = tier,
@@ -48,30 +47,9 @@ namespace LotteryGame.Services
 
             lotteryResult.HouseProfit = houseProfit;
 
-            //debug, remove these 
-            //Console.WriteLine($"Total bank was: {_gameSettings.Currency}{totalGameRevenue}");
-            //Console.WriteLine($"Total distributed reward was: {_gameSettings.Currency}{totalDistributedRewardPerGame}");
-
             return lotteryResult;
 
         }
 
-
-        //public Dictionary<int, (int winningTicketsCount, decimal totalReward)> GetPlayerTierTotalReward(List<Ticket> winningTickets, decimal tierRewardPerWinningTicket)
-        //{
-        //    return winningTickets
-        //        .GroupBy(ticket => ticket.PlayerId)
-        //        .ToDictionary(
-        //            group => group.Key,
-        //            group =>
-        //            (
-        //                WinningTicketsCount: group.Count(),
-        //                TotalReward: group.Count() * tierRewardPerWinningTicket
-        //            )
-        //        )
-        //        .OrderByDescending(kvp => kvp.Value.WinningTicketsCount)
-        //        .ThenBy(kvp => kvp.Key)
-        //        .ToDictionary();
-        //}
     }
 }

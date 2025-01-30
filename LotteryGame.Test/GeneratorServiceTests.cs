@@ -202,6 +202,33 @@ namespace LotteryGame.Test
             var ex = Assert.Throws<LotteryException>(() => generatorService.PickWinningTickets(2, tickets));
             Assert.Contains("exceeds the number of available tickets", ex.Message);
         }
+        
+        [Fact]
+        public void PickWinningTickets_ShouldIgnoreAlreadyWinningTickets()
+        {
+            var gameSettings = new GameSettings();
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var generatorService = new GeneratorService(gameSettingsOptions, Mock.Of<IRandomService>());
+
+            var tickets = new List<Ticket>
+            {
+                new Ticket (1)  { HasWon = true },
+                new Ticket (1) { HasWon = false },
+                new Ticket (2) { HasWon = false },
+                new Ticket (2) { HasWon = true },
+                new Ticket (3) { HasWon = true },
+                new Ticket (4) { HasWon = false },
+                new Ticket (5) { HasWon = true },
+            };
+
+            var originalIds = tickets.Where(t => !t.HasWon).Select(t => t.Id).ToList();
+        
+            var result = generatorService.PickWinningTickets(3, tickets);
+
+            Assert.Equal(3, result.Count);
+            Assert.All(result, ticket => Assert.True(ticket.HasWon));
+            Assert.All(result, ticket => Assert.Contains(ticket.Id, originalIds));
+        }
 
     }
 }

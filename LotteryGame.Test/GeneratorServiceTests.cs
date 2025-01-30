@@ -161,5 +161,47 @@ namespace LotteryGame.Test
             Assert.Equal(originalTickets[2], ticketsToShuffle[1]);
             Assert.Equal(originalTickets[3], ticketsToShuffle[2]);
         }
+        
+        [Theory]
+        [InlineData(1, 1, 1)]
+        [InlineData(1, 100, 1)]
+        [InlineData(12, 95, 12)]
+        [InlineData(0, 95, 0)]
+        [InlineData(95, 95, 95)]
+        public void PickWinningTickets_ShouldReturnCorrectNumberOfWinners(int amountToPick, int totalTicketsCount, int expectedResult)
+        {
+            var gameSettings = new GameSettings();
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var generatorService = new GeneratorService(gameSettingsOptions, Mock.Of<IRandomService>());
+            List<Ticket> allTickets = new();
+
+            for (int i = 0; i < totalTicketsCount; i++)
+            {
+                Ticket ticket = new(i);
+                allTickets.Add(ticket);
+            }
+
+            var result = generatorService.PickWinningTickets(amountToPick, allTickets);
+
+            Assert.Equal(expectedResult, result.Count);
+            Assert.All(result, ticket => Assert.True(ticket.HasWon));
+        }
+        
+        [Fact]
+        public void PickWinningTickets_CountToPickExceedsAvailableTickets_ThrowsException()
+        {
+            var gameSettings = new GameSettings();
+            var gameSettingsOptions = GetGameSettingsOptions(gameSettings);
+            var generatorService = new GeneratorService(gameSettingsOptions, Mock.Of<IRandomService>());
+
+            var tickets = new List<Ticket>
+            {
+                new Ticket(1)
+            };
+
+            var ex = Assert.Throws<LotteryException>(() => generatorService.PickWinningTickets(2, tickets));
+            Assert.Contains("exceeds the number of available tickets", ex.Message);
+        }
+
     }
 }

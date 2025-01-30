@@ -3,7 +3,7 @@
 namespace LotteryGame
 {
     [Serializable]
-    internal class LotteryException : Exception
+    public class LotteryException : Exception
     {
         public LotteryException()
         {
